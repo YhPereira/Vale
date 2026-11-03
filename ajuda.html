@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ajuda e Suporte - Vale</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto:wght@500;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
 
+<body>
     <header>
         <div class="header-container">
             <div class="logo-area">
                 <h1>VALE</h1>
             </div>
 
+            <!-- Botão Hambúrguer (Apenas HTML + CSS) -->
             <input type="checkbox" id="menu-toggle" aria-label="Abrir menu de navegação">
             <label for="menu-toggle" class="menu-icon">
                 <span></span>
@@ -38,30 +41,110 @@
     <main>
         <section class="about-header">
             <h2>Central de Ajuda & Suporte</h2>
-            <p>Dúvidas frequentes sobre o sistema de Mapeamento e Localização de Ativos da Vale.</p>
+            <p>Guia passo a passo para navegação e utilização do Sistema de Localização de Ativos da Vale.</p>
+            
+            <!-- Caixa de Link de Documentação Extensa -->
+            <div style="margin-top: 1.5rem; padding: 1rem; background-color: rgba(0, 126, 122, 0.08); border-left: 4px solid var(--color-primary); border-radius: 8px; text-align: center;">
+                <p style="font-weight: 600; color: var(--color-primary); margin: 0;">
+                    Para mais informações clique aqui: <a href="https://docs.google.com/document/d/1EgimmjoR_t6kgV2uXdYvvJAtBf52M0DjRnztHCuvjzs/edit?usp=sharing" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary); text-decoration: underline;">Documentação Completa no Google Docs</a>
+                </p>
+            </div>
         </section>
 
-        <div class="content-flex-container" style="flex-direction: column; gap: 1.5rem;">
-            <div class="table-container" style="padding: 1.5rem;">
-                <h3 style="color: var(--color-primary); margin-bottom: 0.5rem;">Como localizar um item rapidamente?</h3>
-                <p style="line-height: 1.6; color: #495057;">Utilize a barra de pesquisa na página inicial ou na aba <strong>Pesquisar</strong> digitando o nome ou o código PAT do equipamento. O sistema indicará o galpão, corredor e prateleira exatos.</p>
-            </div>
+        <div class="content-flex-container" style="flex-direction: column; gap: 1.25rem;">
 
-            <div class="table-container" style="padding: 1.5rem;">
-                <h3 style="color: var(--color-primary); margin-bottom: 0.5rem;">O que fazer em caso de divergência no inventário?</h3>
-                <p style="line-height: 1.6; color: #495057;">Se o item não estiver na localização apontada pelo painel, comunique imediatamente o almoxarifado central para reajustar as coordenadas no cadastro.</p>
-            </div>
+            <!-- Tarefa 1: Tela Início (home.html) -->
+            <details class="table-container" style="padding: 1.25rem; cursor: pointer;">
+                <summary style="font-weight: 600; font-size: 1.1rem; color: var(--color-primary);">
+                    Como consultar a localização rápida de um item na página Inicial?
+                </summary>
+                <div style="margin-top: 1rem; color: #495057; line-height: 1.6;">
+                    <ol style="margin-left: 1.5rem;">
+                        <li>Clique no botão <strong>Início</strong> no menu de navegação superior.</li>
+                        <li>Localize o campo com o texto <strong>"Digite o nome ou código do item (ex: PAT-2201)..."</strong> na seção central.</li>
+                        <li>Digite o código do patrimônio ou nome da ferramenta desejada.</li>
+                        <li>Verifique o resultado na tabela <strong>Resultados da Pesquisa</strong> informando a coluna <strong>Localização</strong> e o estado na coluna <strong>Estado</strong>.</li>
+                    </ol>
+                </div>
+            </details>
 
-            <div class="table-container" style="padding: 1.5rem;">
-                <h3 style="color: var(--color-primary); margin-bottom: 0.5rem;">Contato com o Suporte Técnico de TI</h3>
-                <p style="line-height: 1.6; color: #495057;">Em caso de instabilidade no painel web ou leitor de código, contate o ramal interno de TI da unidade operacional ou acione os desenvolvedores Yuri Honorato e Filipe.</p>
-            </div>
+            <!-- Tarefa 2: Tela Pesquisar (pesquisar.html) -->
+            <details class="table-container" style="padding: 1.25rem; cursor: pointer;">
+                <summary style="font-weight: 600; font-size: 1.1rem; color: var(--color-primary);">
+                    Como fazer uma consulta avançada por categoria de ativo?
+                </summary>
+                <div style="margin-top: 1rem; color: #495057; line-height: 1.6;">
+                    <ol style="margin-left: 1.5rem;">
+                        <li>Clique no botão <strong>Pesquisar</strong> no menu superior de navegação.</li>
+                        <li>Clique na caixa de busca <strong>"Digite o nome, setor ou código (ex: PAT-0300)..."</strong>.</li>
+                        <li>Digite a categoria procurada (ex: <em>Hidráulica</em>, <em>Filtros</em>, <em>Conexões</em> ou <em>Ferramentas</em>).</li>
+                        <li>Confira a listagem exibida na tabela <strong>Todos os Itens Encontrados</strong> com as colunas <strong>Código PAT</strong>, <strong>Nome do Item</strong>, <strong>Categoria</strong>, <strong>Localização</strong> e <strong>Estado</strong>.</li>
+                    </ol>
+                </div>
+            </details>
+
+            <!-- Tarefa 3: Tela Leitura de Código (leitura.html) -->
+            <details class="table-container" style="padding: 1.25rem; cursor: pointer;">
+                <summary style="font-weight: 600; font-size: 1.1rem; color: var(--color-primary);">
+                    Como realizar a leitura de uma etiqueta de patrimônio por QR Code ou Câmera?
+                </summary>
+                <div style="margin-top: 1rem; color: #495057; line-height: 1.6;">
+                    <ol style="margin-left: 1.5rem;">
+                        <li>No menu principal, clique na opção <strong>Leitura de Código</strong>.</li>
+                        <li>Aponte a câmera do seu dispositivo móvel ou coletor de dados para a etiqueta física colada na ferramenta.</li>
+                        <li>Aguarde a confirmação na caixa indicadora <strong>"[ Câmera / Leitor Óptico Ativo ]"</strong>.</li>
+                        <li>O sistema identificará a etiqueta e exibirá os dados do ativo automaticamente na tela.</li>
+                    </ol>
+                </div>
+            </details>
+
+            <!-- Tarefa 4: Tela Histórico (historico.html) -->
+            <details class="table-container" style="padding: 1.25rem; cursor: pointer;">
+                <summary style="font-weight: 600; font-size: 1.1rem; color: var(--color-primary);">
+                    Como verificar quem retirou ou devolveu um equipamento?
+                </summary>
+                <div style="margin-top: 1rem; color: #495057; line-height: 1.6;">
+                    <ol style="margin-left: 1.5rem;">
+                        <li>Acesse o menu superior e clique em <strong>Histórico</strong>.</li>
+                        <li>Consulte a tabela <strong>Últimas Transações</strong>.</li>
+                        <li>Confira o registro observando as colunas <strong>Data / Hora</strong>, <strong>Código PAT</strong>, <strong>Item</strong>, <strong>Colaborador</strong> e o tipo de <strong>Ação</strong> (ex: <em>Retirada</em>, <em>Devolução</em> ou <em>Enviado p/ Manutenção</em>).</li>
+                    </ol>
+                </div>
+            </details>
+
+            <!-- Tarefa 5: Tela Sobre (sobre.html) -->
+            <details class="table-container" style="padding: 1.25rem; cursor: pointer;">
+                <summary style="font-weight: 600; font-size: 1.1rem; color: var(--color-primary);">
+                    Como encontrar os contatos da equipe de desenvolvimento do sistema?
+                </summary>
+                <div style="margin-top: 1rem; color: #495057; line-height: 1.6;">
+                    <ol style="margin-left: 1.5rem;">
+                        <li>Clique na opção <strong>Sobre</strong> no menu de navegação.</li>
+                        <li>Navegue até os cartões dos integrantes da equipe (<em>Yuri Honorato</em> ou <em>Filipe</em>).</li>
+                        <li>Clique no botão <strong>Perfil no Instagram</strong> abaixo do integrante com quem deseja entrar em contato.</li>
+                    </ol>
+                </div>
+            </details>
+
+            <!-- Tarefa 6: Tela Ajuda (ajuda.html) -->
+            <details class="table-container" style="padding: 1.25rem; cursor: pointer;">
+                <summary style="font-weight: 600; font-size: 1.1rem; color: var(--color-primary);">
+                    Como reportar instabilidade ou dúvidas não cobertas por este guia?
+                </summary>
+                <div style="margin-top: 1rem; color: #495057; line-height: 1.6;">
+                    <ol style="margin-left: 1.5rem;">
+                        <li>Acesse o destaque superior com a mensagem <strong>"Para mais informações clique aqui"</strong>.</li>
+                        <li>Abra o documento oficial no Google Docs para ler as diretrizes operacionais de TI.</li>
+                        <li>Se o problema persistir, entre em contato via ramal interno ou acione a equipe na página <strong>Sobre</strong>.</li>
+                    </ol>
+                </div>
+            </details>
+
         </div>
     </main>
 
     <footer>
-        <p>Vale - 2026</p>
+        <p>Sistema de Localização de Ativos - Desafio 07 (Vale) | UC7 & UC14</p>
     </footer>
-
 </body>
 </html>
