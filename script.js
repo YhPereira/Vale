@@ -78,6 +78,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (window.location.pathname.includes('historico.html')) {
     initMultiPageHistory();
   }
+
+  // 5. Se for a página de Cadastro (cadastrar.html)
+  if (window.location.pathname.includes('cadastrar.html') || $('registerForm')) {
+    initRegisterPage();
+  }
 });
 
 /* ==========================================================================
@@ -122,7 +127,10 @@ function initScannerPage() {
 
     if (!item) {
       resultDiv.style.borderColor = '#dc3545';
-      resultDiv.innerHTML = `<p style="color:#dc3545; font-weight:600;">✖ Código "${esc(cleanCode)}" não encontrado no cadastro.</p>`;
+      resultDiv.innerHTML = `
+        <p style="color:#dc3545; font-weight:600; margin-bottom:0.8rem;">Esse código não está cadastrado</p>
+        <a href="cadastrar.html?code=${encodeURIComponent(cleanCode)}" style="display:inline-block; background:var(--color-primary); color:#fff; text-decoration:none; padding:0.6rem 1.2rem; border-radius:6px; font-weight:600; font-size:0.95rem;">+ Cadastrar Código</a>
+      `;
       return;
     }
 
@@ -211,8 +219,14 @@ function initScannerPage() {
   });
 
   simulateBtn.addEventListener('click', () => {
-    const randomItem = items[Math.floor(Math.random() * items.length)];
-    showScannedItem(randomItem.code);
+    const simulateUnknown = Math.random() < 0.35;
+    if (simulateUnknown) {
+      const randomCode = 'PAT-' + Math.floor(5000 + Math.random() * 4999);
+      showScannedItem(randomCode);
+    } else {
+      const randomItem = items[Math.floor(Math.random() * items.length)];
+      showScannedItem(randomItem.code);
+    }
   });
 
   manualBtn.addEventListener('click', () => {
@@ -301,6 +315,7 @@ function initMultiPageSearch() {
 
   if (searchInput) {
     searchInput.addEventListener('input', e => {
+      // Se o usuário escolheu do autocomplete "PAT-2201 - Bomba...", extrai o código ou termo
       const val = e.target.value.includes(' - ') ? e.target.value.split(' - ')[0] : e.target.value;
       renderMultiPageTable(val);
     });
@@ -549,7 +564,7 @@ function initSpaApp() {
   function renderWarehouseOptions() {
     const select = $('sector');
     if (!select) return;
-    select.innerHTML = '<option value="">⚑ Setor: todos</option>' + warehouses.name(name => `<option value="${esc(name)}">${esc(name)}</option>`).join('');
+    select.innerHTML = '<option value="">⚑ Setor: todos</option>' + warehouses.map(name => `<option value="${esc(name)}">${esc(name)}</option>`).join('');
   }
 
   function populateWithdrawSelect() { renderWithdrawOptions(); }
@@ -659,4 +674,89 @@ function initSpaApp() {
   }
 
   loadItems();
+}
+
+/* ==========================================================================
+   MÓDULO 5: CADASTRO DE PRODUTOS E CÓDIGOS (cadastrar.html)
+   ========================================================================== */
+function initRegisterPage() {
+  const form = $('registerForm');
+  const feedback = $('registerFeedback');
+  const recentList = $('recentRegisteredList');
+  if (!form) return;
+
+  function renderRecentItems() {
+    if (!recentList) return;
+    const latest = items.slice(0, 6);
+    recentList.innerHTML = latest.map(i => `
+      <li style="flex-direction: column; gap: 2px;">
+        <div><strong>${esc(i.code)}</strong> — ${esc(i.name)}</div>
+        <span style="font-size: 0.8rem; color: #666;">${esc(i.loc)} (${esc(i.status)})</span>
+      </li>
+    `).join('');
+  }
+
+  renderRecentItems();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const prefillCode = urlParams.get('code');
+  if (prefillCode && $('prodCode')) {
+    $('prodCode').value = prefillCode.toUpperCase();
+    if ($('prodName')) $('prodName').focus();
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const code = $('prodCode').value.trim().toUpperCase();
+    const name = $('prodName').value.trim();
+    const cat = $('prodCat').value;
+    const sector = $('prodSector').value;
+    const loc = $('prodLoc').value.trim();
+
+    if (!code || !name || !loc) return;
+
+    const exists = items.some(i => i.code.toUpperCase() === code);
+    feedback.style.display = 'block';
+
+    if (exists) {
+      feedback.style.background = '#fff4e5';
+      feedback.style.color = '#855500';
+      feedback.style.border = '1px solid #ffd8a8';
+      feedback.textContent = `⚠️ O código "${code}" já está cadastrado no sistema.`;
+      return;
+    }
+
+    const newItem = {
+      code,
+      name,
+      cat,
+      sector,
+      prateleira: loc,
+      loc,
+      status: 'Disponível',
+      employee: '',
+      employeeName: ''
+    };
+
+    items.unshift(newItem);
+    currentMoves.unshift({
+      date: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }),
+      code,
+      item: name,
+      type: 'Cadastro Inicial',
+      location: loc,
+      employee: 'Almoxarifado',
+      obs: 'Novo item adicionado ao sistema'
+    });
+
+    saveLocalState();
+    renderRecentItems();
+
+    feedback.style.background = '#eaf6ee';
+    feedback.style.color = '#155e37';
+    feedback.style.border = '1px solid #b2f2bb';
+    feedback.textContent = `✓ Produto "${name}" (${code}) cadastrado com sucesso e já disponível para busca e leitura!`;
+
+    form.reset();
+  });
 }
