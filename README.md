@@ -6,7 +6,7 @@ Nas operações industriais e pátios da Vale, a perda de tempo na busca por pe�
 
 ## 🖼️ Interface do Sistema (Tela Principal)
 
-![Interface Principal do Sistema de Localização de Ativos da Vale](logo-title.png)
+![Interface Principal do Sistema de Localização de Ativos da Vale](image_7ceb44.jpg)
 
 *Exemplo da interface do painel corporativo exibindo a pesquisa de ativos e o inventário rápido.*
 
