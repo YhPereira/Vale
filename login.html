@@ -6,6 +6,7 @@
     <title>Acesso ao Sistema - Vale Localiza</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="logo-title.png">
     <style>
         :root {
             --login-primary: var(--color-primary, #007e7a);
@@ -94,7 +95,7 @@
         }
 
         .login-brand img {
-            max-height: 85px;
+            max-height: 95px;
             width: auto;
             margin-bottom: 0.75rem;
             object-fit: contain;
@@ -314,7 +315,7 @@
     <main class="login-wrapper">
         <div class="login-card">
             <div class="login-brand">
-                <img src="vale localiza 2.jpg" alt="Logo Vale Localiza"
+                <img src="vale localiza 2.png" alt="Logo Vale Localiza"
                      onerror="this.style.display='none'; document.getElementById('brandFallback').style.display='block';">
                 <div id="brandFallback" class="login-brand-fallback">VALE LOCALIZA</div>
                 <h2>Acesso ao Inventário</h2>
@@ -381,14 +382,11 @@
             const togglePasswordBtn = document.getElementById('togglePassword');
             const rememberCheckbox = document.getElementById('rememberUser');
 
-            // Base de usuários categorizados por nível de permissão
             const VALID_USERS = {
-                // Perfis principais de demonstração
                 'gerente':     { pass: 'vale2026', name: 'Carlos Supervisor', matricula: '8801', role: 'gerente',     roleLabel: 'Gerente' },
                 'almoxarife':  { pass: 'vale2026', name: 'Yuri Honorato',     matricula: '8822', role: 'almoxarife',  roleLabel: 'Almoxarife' },
                 'funcionario': { pass: 'vale2026', name: 'Filipe Rodrigues',  matricula: '8825', role: 'funcionario', roleLabel: 'Funcionário' },
 
-                // Usuários individuais da equipe
                 'admin':   { pass: 'vale2026', name: 'Administrador Vale', matricula: '8800', role: 'gerente',     roleLabel: 'Gerente' },
                 'yuri':    { pass: '1234',     name: 'Yuri Honorato',      matricula: '8822', role: 'gerente',     roleLabel: 'Gerente' },
                 'filipe':  { pass: '1234',     name: 'Filipe Rodrigues',   matricula: '8825', role: 'almoxarife',  roleLabel: 'Almoxarife' },
@@ -398,7 +396,6 @@
                 'bruna':   { pass: '1234',     name: 'Bruna Weerds',       matricula: '8826', role: 'funcionario', roleLabel: 'Funcionário' }
             };
 
-            // Preenche rapidamente ao clicar nos botões de perfil de demonstração
             document.querySelectorAll('.role-quick-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     usernameInput.value = btn.getAttribute('data-user');
