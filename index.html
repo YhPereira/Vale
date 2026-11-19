@@ -1,294 +1,115 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vale Localiza — Protótipo interativo</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/jpeg" href="logo-title.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Localização de Ativos - Vale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/jpeg" href="logo-title.png">
 </head>
-
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="logo"><i class="logo-mark"></i><span>VALE</span></div>
-      <nav class="nav" aria-label="Navegação principal">
-        <button class="active" data-page="busca"><span class="ico">⌕</span><span class="nav-label">Busca
-            rápida</span></button>
-        <button data-page="mapa"><span class="ico">⌖</span><span class="nav-label">Mapa do armazém</span></button>
-        <button data-page="mov"><span class="ico">↔</span><span class="nav-label">Movimentações</span></button>
-        <button data-page="retirada"><span class="ico">✓</span><span class="nav-label">Retirada de
-            material</span></button>
-        <button data-page="status"><span class="ico">◉</span><span class="nav-label">Regras do estoque</span></button>
-        <button data-page="equipe"><span class="ico">♧</span><span class="nav-label">Sobre a equipe</span></button>
-      </nav>
-      <div class="side-foot">Vale Localiza<br>Controle inteligente de materiais</div>
-    </aside>
+
+    <header>
+        <div class="header-container">
+            <div class="logo-area">
+                <h1>VALE</h1>
+            </div>
+
+            <input type="checkbox" id="menu-toggle" aria-label="Abrir menu de navegação">
+            <label for="menu-toggle" class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
+
+            <nav aria-label="Navegação Principal">
+                <ul>
+                    <li><a href="index.html" class="active" aria-current="page">Início</a></li>
+                    <li><a href="pesquisar.html">Pesquisar</a></li>
+                    <li><a href="cadastrar.html">Cadastrar</a></li>
+                    <li><a href="leitura.html">Leitura de Código</a></li>
+                    <li><a href="historico.html">Histórico</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                    <li><a href="ajuda.html">Ajuda</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
     <main>
-      <header class="topbar">
-        <div class="challenge"><span class="target">◎</span> Desafio 07 + Vale</div>
-        <div class="online"><span class="dot"></span> Sistema operacional</div>
-      </header>
-      <div class="content">
-        <section id="page-busca">
-          <div class="page-title">
-            <h1>Encontre um material rapidamente</h1>
-          </div>
-          <div class="panel">
-            <label for="q">Digite o nome ou código do patrimônio</label>
-            <div class="searchrow">
-              <div class="searchbox"><span class="searchicon">⌕</span><input id="q"
-                  placeholder="Ex.: rolamento, ferramenta 2048..." autocomplete="off"></div><button id="search"
-                class="primary">Buscar</button>
+        <section class="hero-section">
+            <div class="hero-text">
+                <div class="page-title">
+                    <h2>Mapeamento e Localização Rápida de Ativos</h2>
+                </div>
+                <p>Encontre ferramentas, peças de reposição e insumos de manutenção em tempo real no almoxarifado ou pátio industrial da Vale.</p>
+                <div class="search-bar-container">
+                    <input type="text" placeholder="Digite o nome ou código do item (ex: PAT-2201)..." aria-label="Pesquisar item">
+                </div>
             </div>
-          </div>
-          <div class="filters">
-            <select id="cat" aria-label="Filtrar por categoria">
-              <option value="">▱ Categoria: todas</option>
-              <option>Ferramentas</option>
-              <option>Peças</option>
-              <option>Equipamentos</option>
-              <option>EPIs</option>
-              <option>Elétrica</option>
-              <option>Hidráulica</option>
-              <option>Outros</option>
-            </select>
-            <select id="sector" aria-label="Filtrar por setor">
-              <option value="">⚑ Setor: todos</option>
-            </select>
-            <select id="status" aria-label="Filtrar por status">
-              <option value="">◉ Status: todos</option>
-              <option>Disponível</option>
-              <option>Em Uso</option>
-              <option>Em Manutenção</option>
-              <option>Perdido</option>
-            </select>
-          </div>
-          <div id="message" class="notice hidden" role="status"></div>
-          <div id="results" class="empty">
-            <div class="map-art"><svg viewBox="0 0 250 140" fill="none" aria-hidden="true">
-                <path d="M20 48 L60 25 L112 44 L159 20 L229 38 L216 108 L153 94 L88 121 L26 93 Z" fill="#e2eee7"
-                  stroke="#c8d9d0" stroke-width="2" />
-                <path d="M60 25 L48 82 L88 121 M112 44 L105 103 M159 20 L153 94 M26 93 L216 108" stroke="#fff"
-                  stroke-width="4" />
-                <path d="M100 71 C130 111 161 55 203 69" stroke="#16804a" stroke-width="2.5" stroke-dasharray="6 5" />
-                <circle cx="203" cy="69" r="5" fill="#e4c928" />
-                <g fill="#78b68d">
-                  <circle cx="12" cy="20" r="2" />
-                  <circle cx="24" cy="20" r="2" />
-                  <circle cx="36" cy="20" r="2" />
-                  <circle cx="12" cy="32" r="2" />
-                  <circle cx="24" cy="32" r="2" />
-                  <circle cx="36" cy="32" r="2" />
-                </g>
-              </svg><span class="pin">●</span></div>
-            <div class="empty-text">Pesquise um material para visualizar sua localização no armazém<div class="subtle">
-                Dica: tente buscar por “FER-992” ou “chave dinamométrica”.</div>
+            <div class="hero-image">
+                <img src="vale.webp" alt="Vale" width="450" height="280">
             </div>
-          </div>
         </section>
 
-        <section id="page-mapa" class="hidden">
-          <div class="section-head">
-            <div>
-              <h2>Mapa do armazém</h2>
-              <p>Consulte a localização física dos materiais nos galpões cadastrados.</p>
-            </div><button class="smallbtn" data-goto="busca">Buscar material</button>
-          </div>
-          <div class="statgrid">
-            <div class="stat"><b id="warehouseCount">0</b><span>Galpões cadastrados</span></div>
-            <div class="stat"><b>12</b><span>Prateleiras exibidas por galpão</span></div>
-            <div class="stat"><b>Ao vivo</b><span>Visualização demonstrativa</span></div>
-          </div>
-          <div id="shelfInfo" class="notice hidden"></div>
-          <div id="warehouses-container"></div>
-        </section>
+        <div class="content-flex-container">
+            <div class="table-container">
+                <h3>Resultados da Pesquisa</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código PAT</th>
+                            <th>Nome do Item</th>
+                            <th>Localização</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>PAT-2201</td>
+                            <td>Bomba Hidráulica #2201</td>
+                            <td>Galpão A - Prateleira 4B</td>
+                            <td><span class="status-badge"><span class="status-dot available"></span> Disponível</span></td>
+                        </tr>
+                        <tr>
+                            <td>PAT-0300</td>
+                            <td>Filtro de Óleo X300</td>
+                            <td>Galpão A - Prateleira 4B</td>
+                            <td><span class="status-badge"><span class="status-dot available"></span> Disponível</span></td>
+                        </tr>
+                        <tr>
+                            <td>PAT-0015</td>
+                            <td>Válvula Esférica #15</td>
+                            <td>Galpão A - Prateleira 3B</td>
+                            <td><span class="status-badge"><span class="status-dot available"></span> Disponível</span></td>
+                        </tr>
+                        <tr>
+                            <td>PAT-3321</td>
+                            <td>Torquímetro 1/2"</td>
+                            <td>Oficina Central > Armário 01</td>
+                            <td><span class="status-badge"><span class="status-dot in-use"></span> Em Uso</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <section id="page-mov" class="hidden">
-          <div class="section-head">
-            <div>
-              <h2>Movimentações</h2>
-              <p>Histórico de movimentações recentes dos materiais.</p>
-            </div><button class="smallbtn" id="newMove">＋ Nova movimentação</button>
-          </div>
-          <div id="moveNotice" class="notice hidden"></div>
-          <div class="panel table-wrap">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Material</th>
-                  <th>Movimentação</th>
-                  <th>Origem / destino</th>
-                  <th>Responsável</th>
-                </tr>
-              </thead>
-              <tbody id="moves"></tbody>
-            </table>
-          </div>
-        </section>
-
-        <section id="page-retirada" class="hidden">
-          <div class="section-head">
-            <div>
-              <h2>Retirada de material</h2>
-              <p>Confirme a retirada identificando o colaborador pela matrícula.</p>
-            </div><span class="pill">Controle de saída</span>
-          </div>
-          <div id="withdrawNotice" class="notice hidden" role="status"></div>
-          1. <div class="panel">
-            <h3>Identifique o material
-            </h3><label for="withdrawItem">Material a retirar</label><select id="withdrawItem"
-              style="width:100%;height:48px;border:1px solid #d5dfdb;border-radius:9px;padding:0 12px;background:#fff;color:#263c40">
-              <option value="">Carregando materiais...</option>
-            </select>
-            <div id="withdrawItemInfo" class="item-meta" style="margin-top:10px"></div>
-          </div>
-          <div class="panel">
-            <h3>2. Matrícula do colaborador</h3><label for="employeeId">Digite a matrícula</label>
-            <div class="searchrow">
-              <div class="searchbox"><span class="searchicon">♙</span><input id="employeeId" inputmode="numeric"
-                  placeholder="Ex.: 8820, 8821..." maxlength="12"></div><button id="confirmWithdraw"
-                class="primary">Confirmar retirada</button>
-            </div>
-            <p class="subtle">Ao confirmar, o status do item muda para “Em Uso” e uma movimentação é registrada neste
-              protótipo.</p>
-          </div>
-          <div class="panel">
-            <h3>Resumo da retirada</h3>
-            <div id="withdrawSummary" class="subtle">Selecione um material para conferir os dados antes de confirmar.
-            </div>
-          </div>
-        </section>
-
-        <section id="page-status" class="hidden">
-          <div class="section-head">
-            <div>
-              <h2>Status dos itens no estoque</h2>
-              <p>Regras para manter a situação dos materiais clara e atualizada.</p>
-            </div>
-          </div>
-          <div class="status-list" style="display:grid;gap:13px">
-            <div class="panel"
-              style="border-color:#cde6d5;background:linear-gradient(100deg,#f1faf4,#fff);display:flex;gap:16px;align-items:flex-start">
-              <div
-                style="font-size:27px;background:#16804a;color:white;border-radius:50%;width:52px;height:52px;display:grid;place-items:center;flex-shrink:0">
-                ✓</div>
-              <div style="flex:1">
-                <h3 style="margin:3px 0 7px">Disponível</h3>
-                <p style="margin:0;color:#52676b">O item está no estoque e pode ser retirado por um colaborador
-                  autorizado.</p>
-              </div><span class="pill">Pode retirar</span>
-            </div>
-            <div class="panel"
-              style="border-color:#cfe1fb;background:linear-gradient(100deg,#f2f7ff,#fff);display:flex;gap:16px;align-items:flex-start">
-              <div
-                style="font-size:25px;background:#2876cb;color:white;border-radius:50%;width:52px;height:52px;display:grid;place-items:center;flex-shrink:0">
-                ♙</div>
-              <div style="flex:1">
-                <h3 style="margin:3px 0 7px">Em Uso</h3>
-                <p style="margin:0;color:#52676b">O item foi retirado. Registre a matrícula do responsável e a data da
-                  retirada.</p>
-              </div><span class="pill" style="background:#eaf2ff;color:#205ca3">Com colaborador</span>
-            </div>
-            <div class="panel"
-              style="border-color:#ffdfbf;background:linear-gradient(100deg,#fff8f0,#fff);display:flex;gap:16px;align-items:flex-start">
-              <div
-                style="font-size:25px;background:#ed8617;color:white;border-radius:50%;width:52px;height:52px;display:grid;place-items:center;flex-shrink:0">
-                ⚒</div>
-              <div style="flex:1">
-                <h3 style="margin:3px 0 7px">Em Manutenção</h3>
-                <p style="margin:0;color:#52676b">O item está em inspeção, reparo ou manutenção preventiva e não pode
-                  ser retirado.</p>
-              </div><span class="pill warn">Indisponível</span>
-            </div>
-            <div class="panel"
-              style="border-color:#f3cccc;background:linear-gradient(100deg,#fff4f4,#fff);display:flex;gap:16px;align-items:flex-start">
-              <div
-                style="font-size:25px;background:#d93434;color:white;border-radius:50%;width:52px;height:52px;display:grid;place-items:center;flex-shrink:0">
-                !</div>
-              <div style="flex:1">
-                <h3 style="margin:3px 0 7px">Perdido</h3>
-                <p style="margin:0;color:#52676b">O item não foi localizado. Bloqueie novas retiradas e registre uma
-                  investigação.</p>
-              </div><span class="pill" style="background:#ffebeb;color:#b52222">Investigar</span>
-            </div>
-          </div>
-          <div class="notice" style="margin-top:14px">Regra do sistema: a retirada muda o status de “Disponível” para
-            “Em Uso”. A devolução deve retornar o item para “Disponível”, a menos que ele precise de manutenção.
-            “Perdido” exige conferência antes de qualquer alteração.</div>
-        </section>
-
-        <section id="page-equipe" class="hidden">
-          <div class="section-head">
-            <div>
-              <h2>Sobre a equipe</h2>
-              <p>Projeto de localização e controle de materiais em galpões.</p>
-            </div>
-          </div>
-          <div class="panel">
-            <h3>Vale Localiza</h3>
-            <p>Uma solução para reduzir o tempo gasto procurando ferramentas, peças e insumos, facilitando a consulta da
-              localização e do status de cada item.</p>
-            <p><b>Objetivo:</b> tornar a localização dos materiais mais rápida, clara e organizada.</p>
-            <div class="notice">Aplicação conectada a um banco SQLite local. Os dados e movimentações são armazenados no
-              arquivo vale.db.</div>
-          </div>
-          <div class="panel">
-            <h3>Integrantes da Equipe</h3>
-            <p class="subtle">Desenvolvedores responsáveis pelo projeto integrador (Desafio 07 + Vale):</p>
-            <div class="team-grid">
-              <div class="member-card">
-                <div class="member-avatar">DL</div>
-                <div>
-                  <div class="item-name">Davi Locatel</div>
-                  <div class="item-meta">Desenvolvedor · Matrícula: 8821</div>
-                </div>
-              </div>
-              <div class="member-card">
-                <div class="member-avatar">YH</div>
-                <div>
-                  <div class="item-name">Yuri Honorato</div>
-                  <div class="item-meta">Desenvolvedor · Matrícula: 8822</div>
-                </div>
-              </div>
-              <div class="member-card">
-                <div class="member-avatar">AB</div>
-                <div>
-                  <div class="item-name">Anne Beatriz</div>
-                  <div class="item-meta">Desenvolvedora · Matrícula: 8823</div>
-                </div>
-              </div>
-              <div class="member-card">
-                <div class="member-avatar">WV</div>
-                <div>
-                  <div class="item-name">Wemilly Vitoria</div>
-                  <div class="item-meta">Desenvolvedora · Matrícula: 8824</div>
-                </div>
-              </div>
-              <div class="member-card">
-                <div class="member-avatar">FR</div>
-                <div>
-                  <div class="item-name">Filipe Rodrigues</div>
-                  <div class="item-meta">Desenvolvedor · Matrícula: 8825</div>
-                </div>
-              </div>
-              <div class="member-card">
-                <div class="member-avatar">BW</div>
-                <div>
-                  <div class="item-name">Bruna Weerds</div>
-                  <div class="item-meta">Desenvolvedora · Matrícula: 8826</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-      </div>
+            <aside class="sidebar-card">
+                <h3>Inventário Rápido</h3>
+                <ul>
+                    <li><span>Total de Itens:</span> <strong>1.430</strong></li>
+                    <li><span>Disponíveis:</span> <strong>1.240</strong></li>
+                    <li><span>Em Uso:</span> <strong>152</strong></li>
+                    <li><span>Manutenção:</span> <strong>38</strong></li>
+                </ul>
+            </aside>
+        </div>
     </main>
-  </div>
-  <script src="script.js"></script>
-</body>
 
+    <footer>
+        <p>Vale - 2026</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
 </html>

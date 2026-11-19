@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso ao Sistema - Vale Localiza</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --login-primary: var(--color-primary, #007e7a);
+            --login-primary-dark: #006360;
+            --login-accent: #eab308;
+            --login-bg: var(--bg-light, #f4f7f6);
+            --login-border: var(--border-color, #dce3e1);
+            --login-text: #1e293b;
+            --login-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body.login-page {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--login-bg);
+            color: var(--login-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .login-top-bar {
+            background-color: #ffffff;
+            border-bottom: 3px solid var(--login-accent);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .login-top-bar span {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            color: var(--login-primary);
+            letter-spacing: 0.5px;
+            font-size: 1.1rem;
+        }
+
+        .login-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--login-primary);
+            background: rgba(0, 126, 122, 0.08);
+            padding: 0.35rem 0.85rem;
+            border-radius: 999px;
+        }
+
+        .login-status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #16a34a;
+            border-radius: 50%;
+        }
+
+        .login-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+        }
+
+        .login-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 460px;
+            padding: 2.25rem 2rem;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .login-brand {
+            text-align: center;
+            margin-bottom: 1.6rem;
+        }
+
+        .login-brand img {
+            max-height: 85px;
+            width: auto;
+            margin-bottom: 0.75rem;
+            object-fit: contain;
+        }
+
+        .login-brand-fallback {
+            display: none;
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.85rem;
+            font-weight: 700;
+            color: var(--login-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-brand h2 {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1.35rem;
+            color: var(--login-text);
+            margin-bottom: 0.35rem;
+        }
+
+        .login-brand p {
+            font-size: 0.9rem;
+            color: var(--login-muted);
+            line-height: 1.4;
+        }
+
+        .login-feedback {
+            display: none;
+            padding: 0.85rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .login-feedback.error {
+            display: block;
+            background-color: #fef2f2;
+            color: #b91c1c;
+            border-left: 4px solid #dc2626;
+        }
+
+        .login-feedback.success {
+            display: block;
+            background-color: #f0fdf4;
+            color: #15803d;
+            border-left: 4px solid #16a34a;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.92rem;
+            color: var(--login-text);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 2px solid var(--login-border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            color: var(--login-text);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--login-primary);
+            box-shadow: 0 0 0 3px rgba(0, 126, 122, 0.14);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 0.85rem;
+            background: none;
+            border: none;
+            color: var(--login-muted);
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0.25rem 0.4rem;
+        }
+
+        .toggle-password:hover {
+            color: var(--login-primary);
+        }
+
+        .login-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--login-muted);
+        }
+
+        .login-options label {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            cursor: pointer;
+        }
+
+        .btn-login {
+            background-color: var(--login-primary);
+            color: #ffffff;
+            border: none;
+            padding: 0.95rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-top: 0.2rem;
+        }
+
+        .btn-login:hover {
+            background-color: var(--login-primary-dark);
+        }
+
+        .btn-login:active {
+            transform: scale(0.99);
+        }
+
+        .demo-credentials {
+            margin-top: 1.5rem;
+            padding: 0.95rem 1rem;
+            background-color: rgba(0, 126, 122, 0.06);
+            border-left: 4px solid var(--login-primary);
+            border-radius: 8px;
+            font-size: 0.83rem;
+            color: #334155;
+        }
+
+        .demo-credentials-title {
+            font-weight: 600;
+            margin-bottom: 0.55rem;
+            color: var(--login-text);
+        }
+
+        .role-quick-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .role-quick-btn {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 0.45rem 0.7rem;
+            font-size: 0.81rem;
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .role-quick-btn:hover {
+            border-color: var(--login-primary);
+            background: #f0fdfa;
+        }
+
+        .role-badge {
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.74rem;
+        }
+
+        .role-badge.gerente { background: #fef3c7; color: #92400e; }
+        .role-badge.almoxarife { background: #e0f2fe; color: #075985; }
+        .role-badge.funcionario { background: #dcfce7; color: #166534; }
+
+        .login-footer {
+            text-align: center;
+            padding: 1.25rem;
+            font-size: 0.85rem;
+            color: var(--login-muted);
+        }
+    </style>
+</head>
+<body class="login-page">
+
+    <div class="login-top-bar">
+        <span>VALE LOCALIZA</span>
+        <div class="login-status-pill">
+            <span class="login-status-dot"></span>
+            Sistema Operacional
+        </div>
+    </div>
+
+    <main class="login-wrapper">
+        <div class="login-card">
+            <div class="login-brand">
+                <img src="vale localiza 2.jpg" alt="Logo Vale Localiza"
+                     onerror="this.style.display='none'; document.getElementById('brandFallback').style.display='block';">
+                <div id="brandFallback" class="login-brand-fallback">VALE LOCALIZA</div>
+                <h2>Acesso ao Inventário</h2>
+                <p>Informe seu usuário e senha conforme seu perfil operacional.</p>
+            </div>
+
+            <div id="loginFeedback" class="login-feedback" role="alert"></div>
+
+            <form id="loginForm" class="login-form" novalidate>
+                <div class="form-group">
+                    <label for="username">Nome de Usuário</label>
+                    <input type="text" id="username" name="username" placeholder="Digite seu usuário" autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" name="password" placeholder="Digite sua senha" autocomplete="current-password" required>
+                        <button type="button" id="togglePassword" class="toggle-password" aria-label="Mostrar ou ocultar senha">Mostrar</button>
+                    </div>
+                </div>
+
+                <div class="login-options">
+                    <label>
+                        <input type="checkbox" id="rememberUser" checked>
+                        Manter conectado
+                    </label>
+                    <span>UC7 &amp; UC14</span>
+                </div>
+
+                <button type="submit" class="btn-login">Entrar no Sistema</button>
+            </form>
+
+            <div class="demo-credentials">
+                <div class="demo-credentials-title">Perfis de Acesso (clique para preencher):</div>
+                <div class="role-quick-list">
+                    <button type="button" class="role-quick-btn" data-user="gerente" data-pass="vale2026">
+                        <span><strong>gerente</strong> / vale2026 (Acesso Total)</span>
+                        <span class="role-badge gerente">Gerente</span>
+                    </button>
+                    <button type="button" class="role-quick-btn" data-user="almoxarife" data-pass="vale2026">
+                        <span><strong>almoxarife</strong> / vale2026 (Cadastro + Estoque)</span>
+                        <span class="role-badge almoxarife">Almoxarife</span>
+                    </button>
+                    <button type="button" class="role-quick-btn" data-user="funcionario" data-pass="vale2026">
+                        <span><strong>funcionario</strong> / vale2026 (Consulta + Retirada)</span>
+                        <span class="role-badge funcionario">Funcionário</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="login-footer">
+        <p>Sistema de Localização de Ativos - Vale | 2026</p>
+    </footer>
+
+    <script>
+        (function () {
+            const loginForm = document.getElementById('loginForm');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const feedbackBox = document.getElementById('loginFeedback');
+            const togglePasswordBtn = document.getElementById('togglePassword');
+            const rememberCheckbox = document.getElementById('rememberUser');
+
+            // Base de usuários categorizados por nível de permissão
+            const VALID_USERS = {
+                // Perfis principais de demonstração
+                'gerente':     { pass: 'vale2026', name: 'Carlos Supervisor', matricula: '8801', role: 'gerente',     roleLabel: 'Gerente' },
+                'almoxarife':  { pass: 'vale2026', name: 'Yuri Honorato',     matricula: '8822', role: 'almoxarife',  roleLabel: 'Almoxarife' },
+                'funcionario': { pass: 'vale2026', name: 'Filipe Rodrigues',  matricula: '8825', role: 'funcionario', roleLabel: 'Funcionário' },
+
+                // Usuários individuais da equipe
+                'admin':   { pass: 'vale2026', name: 'Administrador Vale', matricula: '8800', role: 'gerente',     roleLabel: 'Gerente' },
+                'yuri':    { pass: '1234',     name: 'Yuri Honorato',      matricula: '8822', role: 'gerente',     roleLabel: 'Gerente' },
+                'filipe':  { pass: '1234',     name: 'Filipe Rodrigues',   matricula: '8825', role: 'almoxarife',  roleLabel: 'Almoxarife' },
+                'davi':    { pass: '1234',     name: 'Davi Locatel',       matricula: '8821', role: 'funcionario', roleLabel: 'Funcionário' },
+                'anne':    { pass: '1234',     name: 'Anne Beatriz',       matricula: '8823', role: 'funcionario', roleLabel: 'Funcionário' },
+                'wemilly': { pass: '1234',     name: 'Wemilly Vitoria',    matricula: '8824', role: 'funcionario', roleLabel: 'Funcionário' },
+                'bruna':   { pass: '1234',     name: 'Bruna Weerds',       matricula: '8826', role: 'funcionario', roleLabel: 'Funcionário' }
+            };
+
+            // Preenche rapidamente ao clicar nos botões de perfil de demonstração
+            document.querySelectorAll('.role-quick-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    usernameInput.value = btn.getAttribute('data-user');
+                    passwordInput.value = btn.getAttribute('data-pass');
+                    feedbackBox.className = 'login-feedback';
+                });
+            });
+
+            togglePasswordBtn.addEventListener('click', function () {
+                const isPassword = passwordInput.type === 'password';
+                passwordInput.type = isPassword ? 'text' : 'password';
+                togglePasswordBtn.textContent = isPassword ? 'Ocultar' : 'Mostrar';
+            });
+
+            function showFeedback(message, type) {
+                feedbackBox.textContent = message;
+                feedbackBox.className = 'login-feedback ' + type;
+            }
+
+            loginForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const rawUser = usernameInput.value.trim().toLowerCase();
+                const rawPass = passwordInput.value;
+
+                if (!rawUser || !rawPass) {
+                    showFeedback('Por favor, preencha o nome de usuário e a senha.', 'error');
+                    return;
+                }
+
+                const account = VALID_USERS[rawUser];
+
+                if (account && account.pass === rawPass) {
+                    const sessionData = {
+                        username: rawUser,
+                        name: account.name,
+                        matricula: account.matricula,
+                        role: account.role,
+                        roleLabel: account.roleLabel,
+                        loggedAt: new Date().toISOString()
+                    };
+
+                    const storage = rememberCheckbox.checked ? localStorage : sessionStorage;
+                    storage.setItem('valeLocalizaUser', JSON.stringify(sessionData));
+
+                    showFeedback(`Bem-vindo(a), ${account.name} (${account.roleLabel})! Redirecionando...`, 'success');
+
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 650);
+                } else {
+                    showFeedback('Nome de usuário ou senha inválidos. Verifique os dados e tente novamente.', 'error');
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

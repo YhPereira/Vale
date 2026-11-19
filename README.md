@@ -12,7 +12,7 @@ Nas operações industriais e pátios da Vale, a perda de tempo na busca por pe�
 
 ## 🌐 Lista de Telas do Sistema
 
-* **Início (`home.html`):** Dashboard principal com busca rápida de ativos, mapa do almoxarifado e indicadores do inventário.
+* **Início (`index.html`):** Dashboard principal com busca rápida de ativos, mapa do almoxarifado e indicadores do inventário.
 * **Pesquisar (`pesquisar.html`):** Tabela de consulta detalhada com filtros por categoria, estado e localização exata do item.
 * **Leitura de Código (`leitura.html`):** Interface simulada do leitor óptico/câmera para identificação rápida por código de patrimônio ou QR Code.
 * **Histórico (`historico.html`):** Registro de auditoria contendo saídas, devoluções e envios para manutenção.
@@ -38,7 +38,7 @@ Nas operações industriais e pátios da Vale, a perda de tempo na busca por pe�
    ```
 
 3. **Executar no Navegador:**
-   * Abra a pasta no seu gerenciador de arquivos e dê um duplo clique em `home.html`.
+   * Abra a pasta no seu gerenciador de arquivos e dê um duplo clique em `index.html`.
    * **Alternativa recomendada:** Abra a pasta no **VS Code** e utilize a extensão **Live Server** clicando em *"Go Live"*.
 
 ## 👥 Quem Fez o Quê (Divisão de Tarefas)
@@ -50,7 +50,7 @@ Nas operações industriais e pátios da Vale, a perda de tempo na busca por pe�
 
 * **Filipe (Front-end Developer):**
   * Arquitetura do Design System Vale no `style.css` (Cores, Fontes e Acessibilidade).
-  * Desenvolvimento da estrutura responsiva das páginas `home.html`, `pesquisar.html`, `sobre.html` e `ajuda.html`.
+  * Desenvolvimento da estrutura responsiva das páginas `index.html`, `pesquisar.html`, `sobre.html` e `ajuda.html`.
   * Implementação do menu hambúrguer mobile e adequação para telas pequenas (Ajuste Viewport).
 
 ## 📊 Status do Projeto (O que já funciona)

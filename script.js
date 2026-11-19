@@ -56,9 +56,118 @@ async function api(url, options = {}) {
 }
 
 /* ==========================================================================
+   CONTROLE DE SESSÃO, PERMISSÕES POR CARGO E BOTÃO DE LOGOUT
+   Perfis: 'gerente' (total), 'almoxarife' (cadastro + estoque), 'funcionario' (operação)
+   ========================================================================== */
+function getCurrentUser() {
+  try {
+    const raw = localStorage.getItem('valeLocalizaUser') || sessionStorage.getItem('valeLocalizaUser');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return {
+      username: parsed.username || 'usuario',
+      name: parsed.name || 'Colaborador',
+      matricula: parsed.matricula || '0000',
+      role: parsed.role || 'funcionario',
+      roleLabel: parsed.roleLabel || 'Funcionário'
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+function hasRole(...allowedRoles) {
+  const user = getCurrentUser();
+  return user ? allowedRoles.includes(user.role) : false;
+}
+
+function initAuthGuard() {
+  const path = window.location.pathname.toLowerCase();
+  const isLoginPage = path.endsWith('login.html');
+  const user = getCurrentUser();
+
+  // 1. Redireciona para o login se não estiver autenticado
+  if (!isLoginPage && !user) {
+    window.location.href = 'login.html';
+    return false;
+  }
+
+  if (!user) return true;
+
+  // 2. Bloqueia acesso direto à página de Cadastro para Funcionários
+  if (path.includes('cadastrar.html') && user.role === 'funcionario') {
+    window.location.href = 'index.html?acesso=negado';
+    return false;
+  }
+
+  // Exibe aviso na home caso o funcionário tenha tentado acessar área restrita
+  if (path.endsWith('index.html') && window.location.search.includes('acesso=negado')) {
+    const mainEl = document.querySelector('main');
+    if (mainEl) {
+      const warnDiv = document.createElement('div');
+      warnDiv.style.cssText = 'background:#fef2f2; color:#b91c1c; border-left:4px solid #dc2626; padding:0.9rem 1.2rem; border-radius:8px; margin-bottom:1.25rem; font-weight:500;';
+      warnDiv.textContent = 'Acesso restrito: apenas perfis de Almoxarife ou Gerente podem cadastrar novos ativos no inventário.';
+      mainEl.prepend(warnDiv);
+    }
+  }
+
+  // 3. Ajusta o menu de navegação conforme o cargo
+  const navList = document.querySelector('header nav ul');
+  if (navList) {
+    // Oculta o link "Cadastrar" para Funcionário
+    if (user.role === 'funcionario') {
+      const cadLink = navList.querySelector('a[href*="cadastrar.html"]');
+      if (cadLink && cadLink.parentElement) {
+        cadLink.parentElement.style.display = 'none';
+      }
+    }
+
+    // Adiciona crachá com Nome + Cargo no menu
+    const roleColors = {
+      gerente:     { bg: '#fef3c7', color: '#92400e' },
+      almoxarife:  { bg: '#e0f2fe', color: '#075985' },
+      funcionario: { bg: '#dcfce7', color: '#166534' }
+    };
+    const badgeStyle = roleColors[user.role] || roleColors.funcionario;
+
+    const profileLi = document.createElement('li');
+    profileLi.style.cssText = 'display:flex; align-items:center;';
+    profileLi.innerHTML = `
+      <span style="background:${badgeStyle.bg}; color:${badgeStyle.color}; padding:0.25rem 0.65rem; border-radius:999px; font-size:0.78rem; font-weight:700; white-space:nowrap;">
+        ${esc(user.name.split(' ')[0])} · ${esc(user.roleLabel)}
+      </span>
+    `;
+    navList.appendChild(profileLi);
+
+    // Adiciona o botão "Sair"
+    const logoutLi = document.createElement('li');
+    const logoutLink = document.createElement('a');
+    logoutLink.href = '#';
+    logoutLink.textContent = 'Sair';
+    logoutLink.style.color = '#d93434';
+    logoutLink.style.fontWeight = '600';
+
+    logoutLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem('valeLocalizaUser');
+      sessionStorage.removeItem('valeLocalizaUser');
+      window.location.href = 'login.html';
+    });
+
+    logoutLi.appendChild(logoutLink);
+    navList.appendChild(logoutLi);
+  }
+
+  return true;
+}
+
+/* ==========================================================================
    INICIALIZAÇÃO GLOBAL (Detecta qual página está aberta)
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
+  // 0. Verifica autenticação e aplica regras do cargo
+  if (!initAuthGuard()) return;
+
   // 1. Se for a versão SPA (index.html com #page-busca)
   if ($('page-busca')) {
     initSpaApp();
@@ -69,8 +178,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initScannerPage();
   }
 
-  // 3. Se for a página Inicial ou Pesquisar multipáginas (home.html / pesquisar.html)
-  if (window.location.pathname.includes('home.html') || window.location.pathname.includes('pesquisar.html')) {
+  // 3. Se for a página Inicial ou Pesquisar multipáginas (index.html / pesquisar.html)
+  if (window.location.pathname.includes('index.html') || window.location.pathname.includes('pesquisar.html')) {
     initMultiPageSearch();
   }
 
@@ -94,6 +203,9 @@ function initScannerPage() {
 
   const scannerBox = container.querySelector('div[style*="dashed"]') || container.querySelector('.scanner-box');
   if (!scannerBox) return;
+
+  const currentUser = getCurrentUser();
+  const canManageCatalog = hasRole('gerente', 'almoxarife');
 
   scannerBox.innerHTML = `
     <div style="position:relative; width:100%; max-width:420px; margin:0 auto; overflow:hidden; border-radius:10px; background:#111; border: 2px solid var(--color-primary);">
@@ -127,15 +239,31 @@ function initScannerPage() {
 
     if (!item) {
       resultDiv.style.borderColor = '#dc3545';
-      resultDiv.innerHTML = `
-        <p style="color:#dc3545; font-weight:600; margin-bottom:0.8rem;">Esse código não está cadastrado</p>
-        <a href="cadastrar.html?code=${encodeURIComponent(cleanCode)}" style="display:inline-block; background:var(--color-primary); color:#fff; text-decoration:none; padding:0.6rem 1.2rem; border-radius:6px; font-weight:600; font-size:0.95rem;">+ Cadastrar Código</a>
-      `;
+      resultDiv.innerHTML = canManageCatalog
+        ? `
+          <p style="color:#dc3545; font-weight:600; margin-bottom:0.8rem;">Esse código não está cadastrado</p>
+          <a href="cadastrar.html?code=${encodeURIComponent(cleanCode)}" style="display:inline-block; background:var(--color-primary); color:#fff; text-decoration:none; padding:0.6rem 1.2rem; border-radius:6px; font-weight:600; font-size:0.95rem;">+ Cadastrar Código</a>
+        `
+        : `
+          <p style="color:#dc3545; font-weight:600; margin-bottom:0.4rem;">Esse código não está cadastrado</p>
+          <p style="color:#495057; font-size:0.88rem;">Solicite ao <strong>Almoxarife</strong> ou <strong>Gerente</strong> para cadastrar a etiqueta <strong>${esc(cleanCode)}</strong> no inventário.</p>
+        `;
       return;
     }
 
     resultDiv.style.borderColor = 'var(--color-primary)';
     const isAvail = item.status === 'Disponível';
+    const isMaint = item.status === 'Em Manutenção';
+
+    let actionHtml = '';
+    if (isAvail) {
+      actionHtml = `<button id="quickWithdrawBtn" style="background:var(--color-primary); color:#fff; border:none; padding:0.55rem 1rem; border-radius:6px; cursor:pointer; font-weight:600;">Registrar Retirada</button>`;
+    } else if (isMaint && !canManageCatalog) {
+      actionHtml = `<span style="color:#b45309; font-size:0.88rem; font-weight:600;">Item em manutenção — liberação restrita ao Almoxarife ou Gerente.</span>`;
+    } else {
+      actionHtml = `<button id="quickReturnBtn" style="background:#2B8A3E; color:#fff; border:none; padding:0.55rem 1rem; border-radius:6px; cursor:pointer; font-weight:600;">${isMaint ? 'Liberar da Manutenção' : 'Registrar Devolução'}</button>`;
+    }
+
     resultDiv.innerHTML = `
       <h4 style="color:var(--color-primary); margin-bottom:0.5rem;">✓ Etiqueta Identificada: ${esc(item.code)}</h4>
       <p style="margin-bottom:0.3rem;"><strong>Item:</strong> ${esc(item.name)}</p>
@@ -143,10 +271,7 @@ function initScannerPage() {
       <p style="margin-bottom:0.3rem;"><strong>Localização Exata:</strong> ${esc(item.loc)}</p>
       <p style="margin-bottom:0.8rem;"><strong>Estado Atual:</strong> <span style="color:${isAvail ? '#2B8A3E' : '#E67700'}; font-weight:700;">${esc(item.status)}</span></p>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        ${isAvail
-          ? `<button id="quickWithdrawBtn" style="background:var(--color-primary); color:#fff; border:none; padding:0.5rem 1rem; border-radius:6px; cursor:pointer; font-weight:600;">Registrar Retirada</button>`
-          : `<button id="quickReturnBtn" style="background:#2B8A3E; color:#fff; border:none; padding:0.5rem 1rem; border-radius:6px; cursor:pointer; font-weight:600;">Registrar Devolução</button>`
-        }
+        ${actionHtml}
       </div>
     `;
 
@@ -155,8 +280,15 @@ function initScannerPage() {
 
     if (wBtn) {
       wBtn.addEventListener('click', () => {
-        const emp = prompt('Digite o nome ou matrícula do colaborador:');
-        if (!emp) return;
+        let emp = `${currentUser.name} (Mat. ${currentUser.matricula})`;
+
+        // Gerente e Almoxarife podem registrar retirada para terceiros no balcão
+        if (canManageCatalog) {
+          const customEmp = prompt('Nome ou matrícula do colaborador que está retirando:', emp);
+          if (!customEmp) return;
+          emp = customEmp.trim();
+        }
+
         item.status = 'Em Uso';
         item.employeeName = emp;
         currentMoves.unshift({
@@ -175,7 +307,7 @@ function initScannerPage() {
         item.status = obs.toLowerCase().includes('danific') ? 'Em Manutenção' : 'Disponível';
         currentMoves.unshift({
           date: new Date().toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }),
-          code: item.code, item: item.name, type: 'Devolução', location: item.loc, employee: item.employeeName || 'Colaborador', obs
+          code: item.code, item: item.name, type: 'Devolução', location: item.loc, employee: item.employeeName || currentUser.name, obs
         });
         item.employeeName = '';
         saveLocalState();
@@ -239,14 +371,13 @@ function initScannerPage() {
 }
 
 /* ==========================================================================
-   MÓDULO 2: BUSCA E TABELA INTERATIVA (home.html & pesquisar.html)
+   MÓDULO 2: BUSCA E TABELA INTERATIVA (index.html & pesquisar.html)
    ========================================================================== */
 function initMultiPageSearch() {
   const searchInput = document.querySelector('.search-bar-container input');
   const tbody = document.querySelector('tbody');
   if (!tbody) return;
 
-  // Autocomplete datalist (Sugestão do cliente)
   if (searchInput) {
     const datalist = document.createElement('datalist');
     datalist.id = 'items-datalist';
@@ -295,7 +426,6 @@ function initMultiPageSearch() {
       </tr>`;
     }).join('');
 
-    // Atualiza card de Inventário Rápido na home.html se existir
     const sidebarList = document.querySelector('.sidebar-card ul');
     if (sidebarList) {
       const total = items.length;
@@ -315,7 +445,6 @@ function initMultiPageSearch() {
 
   if (searchInput) {
     searchInput.addEventListener('input', e => {
-      // Se o usuário escolheu do autocomplete "PAT-2201 - Bomba...", extrai o código ou termo
       const val = e.target.value.includes(' - ') ? e.target.value.split(' - ')[0] : e.target.value;
       renderMultiPageTable(val);
     });
@@ -327,26 +456,57 @@ function initMultiPageSearch() {
    ========================================================================== */
 function initMultiPageHistory() {
   const tbody = document.querySelector('tbody');
+  const tableContainer = document.querySelector('.table-container');
   if (!tbody) return;
 
+  const currentUser = getCurrentUser();
+  const isAuditorOrBoss = hasRole('gerente', 'almoxarife');
+
+  // Exibe faixa informando o escopo de visualização do perfil
+  if (tableContainer && currentUser) {
+    const scopeBanner = document.createElement('div');
+    scopeBanner.style.cssText = 'padding:0.65rem 0.9rem; border-radius:6px; margin-bottom:1rem; font-size:0.86rem; background:rgba(0,126,122,0.08); color:var(--color-primary); font-weight:500;';
+    scopeBanner.textContent = isAuditorOrBoss
+      ? `Visão de Auditoria (${currentUser.roleLabel}): exibindo todas as movimentações da unidade.`
+      : `Visão Operacional (${currentUser.roleLabel}): exibindo apenas as movimentações vinculadas a ${currentUser.name}.`;
+    const heading = tableContainer.querySelector('h3');
+    if (heading) heading.insertAdjacentElement('afterend', scopeBanner);
+  }
+
   function renderHistoryTable() {
-    tbody.innerHTML = currentMoves.map((m, idx) => `
-      <tr>
-        <td>${esc(m.date)}</td>
-        <td><strong>${esc(m.code || '-')}</strong></td>
-        <td>${esc(m.item)}</td>
-        <td>${esc(m.employee)}</td>
-        <td>
-          <strong>${esc(m.type)}</strong>
-          ${m.obs ? `<div style="font-size:0.8rem; color:#666;">Obs: ${esc(m.obs)}</div>` : ''}
-          ${m.type === 'Retirada' ? `
-            <div style="margin-top:6px;" id="return-box-${idx}">
-              <button data-return-toggle="${idx}" style="background:var(--color-primary); color:#fff; border:none; padding:5px 12px; border-radius:6px; font-size:0.8rem; cursor:pointer; font-weight:600;">Registrar Devolução</button>
-            </div>
-          ` : ''}
-        </td>
-      </tr>
-    `).join('');
+    // Funcionário visualiza apenas seus próprios registros; Gerente e Almoxarife veem tudo
+    const visibleMoves = isAuditorOrBoss
+      ? currentMoves
+      : currentMoves.filter(m =>
+          (m.employee || '').toLowerCase().includes(currentUser.name.toLowerCase()) ||
+          (m.employee || '').includes(currentUser.matricula)
+        );
+
+    if (!visibleMoves.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#666; padding:1.25rem;">Nenhuma movimentação encontrada para o seu usuário.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = visibleMoves.map((m) => {
+      const realIdx = currentMoves.indexOf(m);
+      return `
+        <tr>
+          <td>${esc(m.date)}</td>
+          <td><strong>${esc(m.code || '-')}</strong></td>
+          <td>${esc(m.item)}</td>
+          <td>${esc(m.employee)}</td>
+          <td>
+            <strong>${esc(m.type)}</strong>
+            ${m.obs ? `<div style="font-size:0.8rem; color:#666;">Obs: ${esc(m.obs)}</div>` : ''}
+            ${m.type === 'Retirada' ? `
+              <div style="margin-top:6px;" id="return-box-${realIdx}">
+                <button data-return-toggle="${realIdx}" style="background:var(--color-primary); color:#fff; border:none; padding:5px 12px; border-radius:6px; font-size:0.8rem; cursor:pointer; font-weight:600;">Registrar Devolução</button>
+              </div>
+            ` : ''}
+          </td>
+        </tr>
+      `;
+    }).join('');
 
     tbody.querySelectorAll('[data-return-toggle]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -404,6 +564,8 @@ function initMultiPageHistory() {
    MÓDULO 4: VERSÃO SPA COMPLETA (index.html com API Python/SQLite ou Fallback)
    ========================================================================== */
 function initSpaApp() {
+  const currentUser = getCurrentUser();
+
   function showPage(p) {
     document.querySelectorAll('[id^="page-"]').forEach(e => e.classList.add('hidden'));
     $('page-' + p).classList.remove('hidden');
@@ -444,10 +606,24 @@ function initSpaApp() {
 
   function actionButtons(i) {
     let actions = [];
-    if (i.status === 'Disponível') actions = [['withdraw', 'Retirar'], ['maintenance', 'Enviar à manutenção'], ['lost', 'Marcar perdido']];
-    if (i.status === 'Em Uso') actions = [['return', 'Registrar devolução'], ['lost', 'Marcar perdido']];
-    if (i.status === 'Em Manutenção') actions = [['maintenance_return', 'Retorno da manutenção']];
-    if (i.status === 'Perdido') actions = [['found', 'Registrar item localizado']];
+    const isGerente = hasRole('gerente');
+    const isAlmoxarife = hasRole('almoxarife');
+
+    if (i.status === 'Disponível') {
+      actions.push(['withdraw', 'Retirar']);
+      if (isGerente || isAlmoxarife) actions.push(['maintenance', 'Enviar à manutenção']);
+      if (isGerente) actions.push(['lost', 'Marcar perdido']);
+    }
+    if (i.status === 'Em Uso') {
+      actions.push(['return', 'Registrar devolução']);
+      if (isGerente) actions.push(['lost', 'Marcar perdido']);
+    }
+    if (i.status === 'Em Manutenção' && (isGerente || isAlmoxarife)) {
+      actions.push(['maintenance_return', 'Retorno da manutenção']);
+    }
+    if (i.status === 'Perdido' && isGerente) {
+      actions.push(['found', 'Registrar item localizado']);
+    }
     return actions.map(([a, label]) => `<button class="smallbtn" data-action="${a}" data-code="${esc(i.code)}">${label}</button>`).join(' ');
   }
 
@@ -567,7 +743,12 @@ function initSpaApp() {
     select.innerHTML = '<option value="">⚑ Setor: todos</option>' + warehouses.map(name => `<option value="${esc(name)}">${esc(name)}</option>`).join('');
   }
 
-  function populateWithdrawSelect() { renderWithdrawOptions(); }
+  function populateWithdrawSelect() {
+    renderWithdrawOptions();
+    if (currentUser && currentUser.role === 'funcionario' && $('employeeId')) {
+      $('employeeId').value = currentUser.matricula;
+    }
+  }
 
   function updateWithdrawSummary() {
     const i = items.find(x => x.code === $('withdrawItem').value);
@@ -624,7 +805,8 @@ function initSpaApp() {
       maintenance: 'enviar à manutenção', maintenance_return: 'registrar o retorno da manutenção',
       lost: 'marcar este item como perdido', found: 'registrar que o item foi localizado'
     };
-    let matricula = prompt(`Digite a matrícula do colaborador para ${labels[action]}. Exemplos: 8820 (Yuri), 8821 (Davi):`);
+    const defaultMat = currentUser ? currentUser.matricula : '';
+    let matricula = prompt(`Digite a matrícula do colaborador para ${labels[action]}:`, defaultMat);
     if (matricula === null) return;
     let observacao = prompt('Observação (opcional):', '') || '';
 
@@ -684,6 +866,8 @@ function initRegisterPage() {
   const feedback = $('registerFeedback');
   const recentList = $('recentRegisteredList');
   if (!form) return;
+
+  const currentUser = getCurrentUser();
 
   function renderRecentItems() {
     if (!recentList) return;
@@ -745,7 +929,7 @@ function initRegisterPage() {
       item: name,
       type: 'Cadastro Inicial',
       location: loc,
-      employee: 'Almoxarifado',
+      employee: currentUser ? `${currentUser.name} (${currentUser.roleLabel})` : 'Almoxarifado',
       obs: 'Novo item adicionado ao sistema'
     });
 
